@@ -71,15 +71,20 @@ jobs:
         run: |
           BODY="$(cat body.txt)"
           body_trunc="$(printf '%s' "$BODY" | head -c 1800)"
+          # L'année du pied de page est calculée, jamais écrite en dur : figée à
+          # 2025, elle repartait telle quelle à chaque release. La même horloge
+          # alimente déjà le champ timestamp, deux lignes plus bas.
+          year="$(date -u +%Y)"
           jq -n --arg title "Mise à jour disponible ($TAG)" \
                 --arg url "$URL" \
                 --arg desc "$body_trunc" \
+                --arg year "$year" \
                 '{
                   username: "RSLTools - Mise à jour",
                   allowed_mentions: { parse: [] },
                   embeds: [{
                     title: $title, url: $url, description: $desc,
-                    color: 52336, footer: { text: "© RSLTools 2025" },
+                    color: 52336, footer: { text: ("© RSLTools " + $year) },
                     timestamp: (now | todate)
                   }]
                 }' \
